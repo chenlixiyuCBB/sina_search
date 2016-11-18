@@ -1,25 +1,39 @@
 # encoding=utf-8
-from scrapy.spider import CrawlSpider
-from scrapy.selector import Selector
+import re
+from scrapy import Spider
 from sina_search.items import weiboItem
-from scrapy.http import Request
+from scrapy import Request
+from bs4 import BeautifulSoup
 
 
-class Spider(CrawlSpider):
+class Spider(Spider):
     name = "sina_search"
-    allowed_domains = ["http://weibo.cn"]
-    page = 1
-    urls = "http://weibo.cn/search/mblog?hideSearchFrame=&keyword=情话&page=%s" % page
-    start_urls = [urls]
+    start_urls = ["http://weibo.cn/search/mblog?hideSearchFrame=&keyword=情话&page=1"]
 
     def parse(self, response):
-        weibos = Selector(response).xpath('//div[@class="c"]')
-        if weibos is not None:
-            for weibo in weibos:
+        soup = BeautifulSoup(response.text, "lxml")
+        pagelist = soup.find_all(id="pagelist")
+        # 获取页数
+        for pages in pagelist:
+            pages = pages.get_text()
+
+        pages = pages[pages.find('/') + 1: len(pages) - 1].encode('ascii')
+        pages = int(pages)
+
+        page = 0
+        while page < pages:
+            page += 1
+            url = "http://weibo.cn/search/mblog?hideSearchFrame=&keyword=情话&page=" + str(page)
+            yield Request(url, callback=self.parse_items)
+
+    def parse_items(self, response):
+        soup = BeautifulSoup(response.text, "lxml")
+        weibos = soup.find_all(id=re.compile("M_"))
+
+        for weibo in weibos:
+            if weibo.find("span", "ctt").get_text is not '':
                 item = weiboItem()
-                item['ID'] = weibo.xpath('@id').extract()
-                item['Text'] = weibo.xpath('span[@class="ctt]/text()').extract()
+                item['ID'] = weibo.find("a", "nk").get_text().encode("utf-8")
+                item['Text'] = weibo.find("span", "ctt").get_text()[1:].encode("utf-8")
                 yield item
-            self.page += 1
-            yield Request(url=self.urls, meta={"item": weiboItem}, callback=self.parse)
-        print "爬取完毕"
+

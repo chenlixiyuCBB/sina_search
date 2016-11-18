@@ -19,7 +19,7 @@ NEWSPIDER_MODULE = 'sina_search.spiders'
 #USER_AGENT = 'sina_search (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -54,7 +54,7 @@ DOWNLOAD_DELAY = 3
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
     "sina_search.middleware.UserAgentMiddleware": 401,
-    "Ssina_search.middleware.CookiesMiddleware": 402,
+    "sina_search.middleware.CookiesMiddleware": 402,
 }
 
 # Enable or disable extensions

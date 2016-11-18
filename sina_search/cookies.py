@@ -2,10 +2,10 @@
 import json
 import base64
 import requests
-
+# 可以多放几个账号密码
 myWeiBo = [
-    {'no': 'jiadieyuso3319@163.com', 'psw': 'a123456'},
-    {'no': 'shudieful3618@163.com', 'psw': 'a123456'},
+    {'no': '在这里输入微博账号', 'psw': '在这里输入微博密码'},
+    {'no': '在这里输入微博账号', 'psw': '在这里输入微博账号'},
 ]
 
 
